@@ -5,10 +5,25 @@ import solara
 sentence = solara.reactive("Solara makes our team more productive.")
 word_limit = solara.reactive(10)
 
+@solara.component_vue("vues/a.vue")
+def A(color="red"):
+    pass
+
+@solara.component_vue("vues/b.vue")
+def B(color="blue"):
+    pass
 
 @solara.component
-def Page():
-    # Calculate word_count within the component to ensure re-execution when reactive variables change.
+def ACom():
+    A()
+
+@solara.component
+def BCom():
+    B()
+
+@solara.component
+def HomeComponent():
+# Calculate word_count within the component to ensure re-execution when reactive variables change.
     word_count = len(sentence.value.split())
 
     solara.SliderInt("Word limit", value=word_limit, min=2, max=20)
@@ -22,6 +37,19 @@ def Page():
     else:
         solara.Success("Great short writing!")
 
+# @solara.component
+# def Page():
 
-# The following line is required only when running the code in a Jupyter notebook:
-Page()
+
+routes = [
+    # route level == 0
+    solara.Route(path="/", component=HomeComponent),  # matches empty path ''
+    solara.Route(
+        # route level == 1
+        path="a", component=ACom,
+        children=[
+            # route level == 2
+            solara.Route(path="/", component=ACom),
+            solara.Route(path="b", component=BCom)  ],
+    )
+    ]
